@@ -26,7 +26,7 @@
             padding: 30px 28px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.3);
         }
-        h1 { font-size: 1.8rem; margin: 0 0 5px 0; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+        h1 { font-size: 1.8rem; margin: 0 0 5px 0; color: #0f172a; }
         .sub { color: #334155; border-left: 3px solid #3b82f6; padding-left: 14px; margin-bottom: 20px; font-weight: 500; }
         
         .controls {
@@ -169,8 +169,8 @@
 
     <div class="controls">
         <div class="mode-switch" id="modeSwitch">
-            <button class="mode-btn active" data-mode="def_to_term">📖 → Слово</button>
-            <button class="mode-btn" data-mode="term_to_def">📝 → Определение</button>
+            <button class="mode-btn active" data-mode="def_to_term">📖 Определение → Термин</button>
+            <button class="mode-btn" data-mode="term_to_def">📝 Термин → Определение</button>
         </div>
         <button id="shuffleBtn" style="background:#475569">🔄 Вперемешку</button>
     </div>
@@ -196,7 +196,7 @@
             </div>
         </div>
     </div>
-    <footer>Режим «Вперемешку» берёт вопросы из всех разделов. Точность не зависит от падежей.</footer>
+    <footer>Правильный ответ должен совпадать с точностью до регистра и знаков препинания. Режим «Вперемешку» берёт вопросы из всех разделов.</footer>
 </div>
 
 <script>
@@ -273,26 +273,26 @@
     };
 
     // ---- Глобальные переменные ----
-    let currentMode = "def_to_term";   // "def_to_term" или "term_to_def"
+    let currentMode = "def_to_term";
     let currentTopic = "Механика";
-    let shuffleMode = false;            // true — вопросы из всех разделов
-    let currentItem = null;             // { term, def, topic }
+    let shuffleMode = false;
+    let currentItem = null;
     let stats = { correct: 0, wrong: 0 };
 
-    // ---- Нормализация строк для сравнения ----
+    // ---- ЧИСТАЯ НОРМАЛИЗАЦИЯ (только регистр и незначащие пробелы) ----
     function normalize(str) {
-        return str.toLowerCase()
-            .replace(/ё/g, "е")
-            .replace(/[^\w\s]/g, "")
-            .replace(/\s+/g, " ")
-            .trim();
+        return str.toLowerCase().trim().replace(/\s+/g, " ");
     }
 
-    // ---- Получить случайный вопрос (с учётом shuffleMode) ----
+    // ---- ТОЧНАЯ ПРОВЕРКА (без либеральных совпадений) ----
+    function isAnswerCorrect(userAnswer, correctAnswer) {
+        return normalize(userAnswer) === normalize(correctAnswer);
+    }
+
+    // ---- Получить случайный вопрос ----
     function getRandomQuestion() {
         let items = [];
         if (shuffleMode) {
-            // собираем все термины из всех разделов
             for (let [topicName, arr] of Object.entries(database)) {
                 for (let item of arr) {
                     items.push({ ...item, topic: topicName });
@@ -308,7 +308,7 @@
         return items[randomIndex];
     }
 
-    // ---- Обновить интерфейс (текст вопроса + статистика) ----
+    // ---- Обновить интерфейс ----
     function updateUI() {
         if (!currentItem) {
             currentItem = getRandomQuestion();
@@ -319,14 +319,11 @@
         const topicName = shuffleMode ? currentItem.topic : currentTopic;
         
         if (currentMode === "def_to_term") {
-            // Показываем определение → пользователь пишет термин
             questionDiv.innerHTML = `📖 <span style="font-weight:normal">[${topicName}]</span><br>📌 Определение:<br>«${currentItem.def}»<br><span style="font-size:0.9rem;">✍️ Напишите ТЕРМИН</span>`;
         } else {
-            // Показываем термин → пользователь пишет определение
             questionDiv.innerHTML = `📝 <span style="font-weight:normal">[${topicName}]</span><br>📌 Термин:<br>«${currentItem.term}»<br><span style="font-size:0.9rem;">✍️ Напишите ОПРЕДЕЛЕНИЕ</span>`;
         }
         
-        // обновляем статистику
         const total = stats.correct + stats.wrong;
         const percent = total === 0 ? 0 : (stats.correct / total) * 100;
         document.getElementById("scorePercent").innerText = Math.round(percent) + "%";
@@ -336,7 +333,7 @@
         document.getElementById("totalCount").innerText = total;
     }
 
-    // ---- Проверка ответа ----
+    // ---- Проверка ответа (исправлена) ----
     function checkAnswer() {
         const userAnswer = document.getElementById("answerInput").value.trim();
         if (!userAnswer) {
@@ -352,29 +349,28 @@
         let correctAnswer = "";
         
         if (currentMode === "def_to_term") {
-            // Сравниваем с термином
             correctAnswer = currentItem.term;
-            isCorrect = normalize(userAnswer) === normalize(correctAnswer);
+            isCorrect = isAnswerCorrect(userAnswer, correctAnswer);
         } else {
-            // Сравниваем с определением
             correctAnswer = currentItem.def;
-            isCorrect = normalize(userAnswer) === normalize(correctAnswer);
+            isCorrect = isAnswerCorrect(userAnswer, correctAnswer);
         }
         
         if (isCorrect) {
             stats.correct++;
-            document.getElementById("feedbackMsg").innerHTML = `<span class='correct-feedback'>✅ Верно! Правильный ответ: ${correctAnswer}</span>`;
+            document.getElementById("feedbackMsg").innerHTML = `<span class='correct-feedback'>✅ Верно!</span>`;
         } else {
             stats.wrong++;
-            document.getElementById("feedbackMsg").innerHTML = `<span class='wrong-feedback'>❌ Неверно. Правильный ответ: ${correctAnswer}</span>`;
+            document.getElementById("feedbackMsg").innerHTML = `<span class='wrong-feedback'>❌ Неверно. Правильный ответ: "${correctAnswer}"</span>`;
         }
         
         updateUI();
         document.getElementById("answerInput").value = "";
-        // авто-переход к следующему вопросу через 1.2 секунды (удобно)
+        
+        // Авто-следующий вопрос через 1 секунду
         setTimeout(() => {
             nextQuestion();
-        }, 1200);
+        }, 1000);
     }
     
     function nextQuestion() {
@@ -388,10 +384,10 @@
         stats.correct = 0;
         stats.wrong = 0;
         updateUI();
-        document.getElementById("feedbackMsg").innerHTML = "📊 Статистика сброшена. Продолжайте!";
+        document.getElementById("feedbackMsg").innerHTML = "📊 Статистика сброшена.";
     }
     
-    // ---- Отрисовка кнопок разделов ----
+    // ---- Кнопки разделов ----
     function renderTopicButtons() {
         const container = document.getElementById("topicSelector");
         container.innerHTML = "";
@@ -408,10 +404,9 @@
                 currentTopic = topic;
                 currentItem = getRandomQuestion();
                 updateUI();
-                // обновить активный стиль
                 document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
-                document.getElementById("feedbackMsg").innerHTML = `Раздел: ${topic}. Введите ответ.`;
+                document.getElementById("feedbackMsg").innerHTML = `Раздел: ${topic}`;
             });
             container.appendChild(btn);
         });
@@ -425,7 +420,6 @@
                 modeBtns.forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
                 currentMode = btn.getAttribute("data-mode");
-                // сбрасываем текущий вопрос, чтобы обновился текст
                 currentItem = getRandomQuestion();
                 updateUI();
                 document.getElementById("feedbackMsg").innerHTML = `Режим: ${currentMode === "def_to_term" ? "Определение → Термин" : "Термин → Определение"}`;
@@ -433,28 +427,26 @@
         });
     }
     
-    // ---- Кнопка "Вперемешку" ----
+    // ---- Режим "Вперемешку" ----
     function setupShuffle() {
         const shuffleBtn = document.getElementById("shuffleBtn");
         shuffleBtn.addEventListener("click", () => {
             shuffleMode = !shuffleMode;
             if (shuffleMode) {
                 shuffleBtn.style.background = "#3b82f6";
-                // убираем активную тему
                 document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
             } else {
                 shuffleBtn.style.background = "#475569";
-                // подсветим текущую тему
                 const activeTopicBtn = Array.from(document.querySelectorAll(".topic-btn")).find(b => b.innerText === currentTopic);
                 if (activeTopicBtn) activeTopicBtn.classList.add("active");
             }
             currentItem = getRandomQuestion();
             updateUI();
-            document.getElementById("feedbackMsg").innerHTML = shuffleMode ? "🎲 Режим «Вперемешку» (все разделы)" : "📁 Обычный режим по разделам";
+            document.getElementById("feedbackMsg").innerHTML = shuffleMode ? "🎲 Режим «Вперемешку»" : "📁 Режим по разделам";
         });
     }
     
-    // ---- Инициализация ----
+    // ---- Запуск ----
     function init() {
         renderTopicButtons();
         initModeButtons();
