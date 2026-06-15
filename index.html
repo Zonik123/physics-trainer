@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Физика: Тренажёр определений</title>
+    <title>Физика: Тренажёр (термин ↔ определение)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,70 +19,87 @@
             margin: 0;
         }
         .card {
-            max-width: 800px;
+            max-width: 850px;
             width: 100%;
             background: rgba(255,255,255,0.95);
             border-radius: 48px;
             padding: 30px 28px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-            transition: all 0.2s;
         }
-        h1 {
-            font-size: 1.8rem;
-            margin: 0 0 8px 0;
-            color: #0f172a;
+        h1 { font-size: 1.8rem; margin: 0 0 5px 0; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+        .sub { color: #334155; border-left: 3px solid #3b82f6; padding-left: 14px; margin-bottom: 20px; font-weight: 500; }
+        
+        .controls {
             display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 60px;
         }
-        .sub {
-            color: #334155;
-            border-left: 3px solid #3b82f6;
-            padding-left: 14px;
-            margin-bottom: 24px;
-            font-weight: 500;
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 40px;
+        }
+        .mode-btn {
+            border: none;
+            padding: 6px 18px;
+            border-radius: 32px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            transition: 0.2s;
+        }
+        .mode-btn.active {
+            background: #3b82f6;
+            color: white;
         }
         .topic-selector {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 28px;
-            background: #f1f5f9;
-            padding: 12px 16px;
-            border-radius: 60px;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 10px 16px;
+            border-radius: 50px;
         }
         .topic-btn {
-            background: transparent;
+            background: #e2e8f0;
             border: none;
-            padding: 8px 18px;
-            border-radius: 40px;
-            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 32px;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
-            color: #1e293b;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .topic-btn.active {
             background: #3b82f6;
             color: white;
-            box-shadow: 0 6px 12px -6px #3b82f680;
         }
         .question-panel {
             background: #f8fafc;
             border-radius: 32px;
             padding: 30px 24px;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
             border: 1px solid #e2e8f0;
         }
-        .definition {
-            font-size: 1.6rem;
+        .question-text {
+            font-size: 1.5rem;
             font-weight: 600;
             line-height: 1.4;
             color: #0f172a;
-            margin-bottom: 28px;
             background: white;
             padding: 24px;
             border-radius: 28px;
+            margin-bottom: 25px;
+            text-align: center;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
         input {
@@ -92,16 +109,11 @@
             border: 2px solid #cbd5e1;
             border-radius: 48px;
             outline: none;
-            transition: 0.2s;
-            background: white;
         }
-        input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px #3b82f620;
-        }
+        input:focus { border-color: #3b82f6; }
         .button-group {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             margin-top: 20px;
             flex-wrap: wrap;
         }
@@ -109,315 +121,353 @@
             background: #1e293b;
             border: none;
             color: white;
-            padding: 12px 22px;
+            padding: 10px 20px;
             border-radius: 40px;
             font-weight: 600;
-            font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.2s;
         }
-        button.primary {
-            background: #3b82f6;
-        }
-        button.primary:hover {
-            background: #2563eb;
-            transform: scale(0.97);
-        }
+        button.primary { background: #3b82f6; }
         .result {
-            margin-top: 24px;
+            margin-top: 20px;
             background: #eef2ff;
             border-radius: 28px;
             padding: 20px;
             text-align: center;
         }
-        .score {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #3b82f6;
-        }
+        .score { font-size: 2rem; font-weight: 800; color: #3b82f6; }
         .accuracy-bar {
             background: #cbd5e1;
             border-radius: 40px;
-            height: 12px;
-            width: 100%;
-            margin: 12px 0;
-            overflow: hidden;
+            height: 10px;
+            margin: 10px 0;
         }
         .fill-bar {
             background: #3b82f6;
             width: 0%;
             height: 100%;
             border-radius: 40px;
-            transition: width 0.2s;
         }
-        .feedback {
-            font-weight: 500;
-            margin-top: 12px;
-        }
+        .feedback { font-weight: 500; margin-top: 12px; }
         .correct-feedback { color: #15803d; }
         .wrong-feedback { color: #b91c1c; }
         .stats {
             display: flex;
             justify-content: space-between;
-            margin-top: 16px;
+            margin-top: 15px;
             font-size: 0.9rem;
-            color: #334155;
         }
-        footer {
-            font-size: 0.75rem;
-            text-align: center;
-            margin-top: 30px;
-            color: #64748b;
-        }
+        footer { font-size: 0.7rem; text-align: center; margin-top: 25px; color: #64748b; }
         @media (max-width: 550px) {
-            .definition { font-size: 1.2rem; }
-            .card { padding: 20px; }
+            .question-text { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>📚 Физика: термины</h1>
-    <div class="sub">Напиши термин по определению • точность в %</div>
+    <h1>📚 Физика: тренажёр</h1>
+    <div class="sub">Термин ↔ Определение • случайный выбор</div>
+
+    <div class="controls">
+        <div class="mode-switch" id="modeSwitch">
+            <button class="mode-btn active" data-mode="def_to_term">📖 → Слово</button>
+            <button class="mode-btn" data-mode="term_to_def">📝 → Определение</button>
+        </div>
+        <button id="shuffleBtn" style="background:#475569">🔄 Вперемешку</button>
+    </div>
 
     <div class="topic-selector" id="topicSelector"></div>
 
     <div class="question-panel">
-        <div class="definition" id="definitionText">Загрузка...</div>
-        <input type="text" id="answerInput" placeholder="Введите ответ..." autocomplete="off">
+        <div class="question-text" id="questionText">Загрузка...</div>
+        <input type="text" id="answerInput" placeholder="Ваш ответ..." autocomplete="off">
         <div class="button-group">
             <button class="primary" id="checkBtn">✅ Проверить</button>
-            <button id="nextBtn">🎲 Следующий вопрос</button>
-            <button id="resetTopicBtn">🔄 Сбросить прогресс по разделу</button>
+            <button id="nextBtn">🎲 Следующий</button>
+            <button id="resetBtn">🔄 Сброс статистики</button>
         </div>
-        <div class="result" id="resultPanel">
+        <div class="result">
             <div class="score" id="scorePercent">— %</div>
             <div class="accuracy-bar"><div class="fill-bar" id="fillBar"></div></div>
-            <div class="feedback" id="feedbackMsg">Нажми «Проверить»</div>
+            <div class="feedback" id="feedbackMsg">Готов к ответу</div>
             <div class="stats">
-                <span>📊 Верно: <span id="correctCount">0</span></span>
+                <span>✅ Верно: <span id="correctCount">0</span></span>
                 <span>❌ Неверно: <span id="wrongCount">0</span></span>
                 <span>📋 Всего: <span id="totalCount">0</span></span>
             </div>
         </div>
     </div>
-    <footer>⭐ Сравнение идёт без учёта падежей — оценивается смысловое ядро. Будь максимально точен.</footer>
+    <footer>Режим «Вперемешку» берёт вопросы из всех разделов. Точность не зависит от падежей.</footer>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // БАЗА ДАННЫХ: разделы + определения (термин: описание)
-    // --------------------------------------------------------------
+    // ======================= БАЗА ДАННЫХ =======================
     const database = {
         "Механика": [
-            { term: "Материальная точка", desc: "Тело, размерами и формой которого в условиях данной задачи можно пренебречь, но обладающее массой." },
-            { term: "Поступательное движение", desc: "Движение, при котором любая прямая, связанная с телом, перемещается параллельно самой себе." },
-            { term: "Траектория", desc: "Линия, которую описывает материальная точка при своем движении." },
-            { term: "Путь", desc: "Скалярная величина, равная длине траектории, пройденной точкой за время." },
-            { term: "Перемещение", desc: "Вектор, соединяющий начальное и конечное положение материальной точки." },
-            { term: "Скорость", desc: "Векторная величина, характеризующая быстроту перемещения и направление движения; производная радиус-вектора по времени." },
-            { term: "Ускорение", desc: "Векторная величина, характеризующая быстроту изменения скорости; производная скорости по времени." },
-            { term: "Тангенциальное ускорение", desc: "Составляющая ускорения, направленная по касательной к траектории; характеризует изменение модуля скорости." },
-            { term: "Нормальное ускорение", desc: "Составляющая ускорения, направленная к центру кривизны траектории; характеризует изменение направления скорости." },
-            { term: "Импульс тела", desc: "Векторная величина, равная произведению массы тела на его скорость." },
-            { term: "Замкнутая система", desc: "Система тел, на которую не действуют внешние силы (или их равнодействующая равна нулю)." },
-            { term: "Закон сохранения импульса", desc: "В замкнутой системе векторная сумма импульсов всех тел остаётся постоянной." },
-            { term: "Абсолютно упругий удар", desc: "Удар, при котором сохраняется механическая энергия системы; тела после удара движутся раздельно." },
-            { term: "Абсолютно неупругий удар", desc: "Удар, после которого тела движутся вместе с одинаковой скоростью; механическая энергия не сохраняется." },
-            { term: "Механическая работа", desc: "Скалярная величина, равная произведению силы на перемещение и косинус угла между ними." },
-            { term: "Кинетическая энергия", desc: "Энергия механического движения тела, равная mv²/2." },
-            { term: "Потенциальная энергия", desc: "Энергия, обусловленная взаимодействием тел и зависящая от их взаимного расположения." },
-            { term: "Закон сохранения механической энергии", desc: "В замкнутой системе с консервативными силами полная механическая энергия сохраняется." },
-            { term: "Инерциальная система отсчёта", desc: "Система отсчёта, в которой тело, не подверженное действию внешних сил, покоится или движется равномерно прямолинейно." },
-            { term: "Сила трения скольжения", desc: "Сила, возникающая при движении одного тела по поверхности другого, равная μN и направленная против движения." },
-            { term: "Сила упругости", desc: "Сила, возникающая при деформации и стремящаяся восстановить форму; подчиняется закону Гука F = -kx." }
+            { term: "Материальная точка", def: "Тело, размерами и формой которого в условиях данной задачи можно пренебречь." },
+            { term: "Поступательное движение", def: "Движение, при котором любая прямая, связанная с телом, перемещается параллельно самой себе." },
+            { term: "Траектория", def: "Линия, которую описывает материальная точка при движении." },
+            { term: "Путь", def: "Скалярная величина, равная длине траектории." },
+            { term: "Перемещение", def: "Вектор, соединяющий начальное и конечное положение точки." },
+            { term: "Скорость", def: "Векторная величина, равная производной радиус-вектора по времени." },
+            { term: "Ускорение", def: "Векторная величина, равная производной скорости по времени." },
+            { term: "Тангенциальное ускорение", def: "Составляющая ускорения, направленная по касательной к траектории; меняет модуль скорости." },
+            { term: "Нормальное ускорение", def: "Составляющая ускорения, направленная к центру кривизны; меняет направление скорости." },
+            { term: "Импульс тела", def: "Векторная величина, равная произведению массы на скорость." },
+            { term: "Замкнутая система", def: "Система тел, на которую не действуют внешние силы." },
+            { term: "Закон сохранения импульса", def: "В замкнутой системе векторная сумма импульсов тел постоянна." },
+            { term: "Абсолютно упругий удар", def: "Удар, при котором сохраняется механическая энергия системы." },
+            { term: "Абсолютно неупругий удар", def: "Удар, после которого тела движутся вместе; механическая энергия не сохраняется." },
+            { term: "Механическая работа", def: "Скаляр, равный произведению силы на перемещение и косинус угла между ними." },
+            { term: "Кинетическая энергия", def: "Энергия движения, равная mv²/2." },
+            { term: "Потенциальная энергия", def: "Энергия взаимодействия тел, зависящая от их взаимного расположения." },
+            { term: "Закон сохранения механической энергии", def: "В замкнутой системе с консервативными силами полная механическая энергия постоянна." },
+            { term: "Инерциальная система отсчёта", def: "Система, в которой тело без внешних сил движется равномерно или покоится." },
+            { term: "Сила трения скольжения", def: "Сила, возникающая при движении одного тела по другому, равная μN." },
+            { term: "Сила упругости", def: "Сила, возникающая при деформации и стремящаяся вернуть форму; F = -kx." }
         ],
         "МКТ и термодинамика": [
-            { term: "Идеальный газ", desc: "Модель газа, в которой пренебрегают размерами молекул и их взаимодействием на расстоянии, учитывая только упругие столкновения." },
-            { term: "Изотермический процесс", desc: "Процесс изменения состояния газа при постоянной температуре (T = const, PV = const)." },
-            { term: "Изобарный процесс", desc: "Процесс при постоянном давлении (P = const, V/T = const)." },
-            { term: "Изохорный процесс", desc: "Процесс при постоянном объёме (V = const, P/T = const)." },
-            { term: "Уравнение состояния идеального газа", desc: "Уравнение Менделеева-Клапейрона PV = (m/M)RT, связывающее давление, объём и температуру." },
-            { term: "Абсолютный нуль", desc: "Температура T = 0 К, при которой прекращается поступательное движение молекул." },
-            { term: "Средняя кинетическая энергия молекулы", desc: "Для одноатомного газа равна (3/2)kT, где k — постоянная Больцмана." },
-            { term: "Число степеней свободы", desc: "Число независимых координат, определяющих положение системы в пространстве." },
-            { term: "Внутренняя энергия идеального газа", desc: "Сумма кинетических энергий всех молекул; U = (m/M)·(i/2)·RT." },
-            { term: "Первое начало термодинамики", desc: "Количество теплоты, переданное системе, идёт на изменение внутренней энергии и совершение работы: Q = ΔU + A." },
-            { term: "Адиабатный процесс", desc: "Процесс без теплообмена с окружающей средой (Q = 0)." },
-            { term: "Формула Майера", desc: "Связь молярных теплоёмкостей: Cp - Cv = R." },
-            { term: "Тепловой двигатель", desc: "Устройство, преобразующее внутреннюю энергию топлива в механическую работу." },
-            { term: "Цикл Карно", desc: "Обратимый круговой процесс, состоящий из двух изотерм и двух адиабат." },
-            { term: "КПД цикла Карно", desc: "η = 1 - T₂/T₁, где T₁ — температура нагревателя, T₂ — холодильника." }
+            { term: "Идеальный газ", def: "Модель газа, где пренебрегают размерами молекул и их взаимодействием на расстоянии." },
+            { term: "Изотермический процесс", def: "Процесс при постоянной температуре (PV = const)." },
+            { term: "Изобарный процесс", def: "Процесс при постоянном давлении (V/T = const)." },
+            { term: "Изохорный процесс", def: "Процесс при постоянном объёме (P/T = const)." },
+            { term: "Уравнение состояния идеального газа", def: "PV = (m/M)RT — уравнение Менделеева-Клапейрона." },
+            { term: "Абсолютный нуль", def: "Температура 0 К, при которой прекращается поступательное движение молекул." },
+            { term: "Средняя кинетическая энергия молекулы", def: "Для одноатомного газа равна (3/2)kT." },
+            { term: "Число степеней свободы", def: "Число независимых координат, определяющих положение системы." },
+            { term: "Внутренняя энергия идеального газа", def: "Сумма кинетических энергий всех молекул." },
+            { term: "Первое начало термодинамики", def: "Q = ΔU + A — теплота идёт на изменение энергии и работу." },
+            { term: "Адиабатный процесс", def: "Процесс без теплообмена с окружающей средой (Q = 0)." },
+            { term: "Формула Майера", def: "Cp - Cv = R." },
+            { term: "Тепловой двигатель", def: "Устройство, превращающее внутреннюю энергию в механическую работу." },
+            { term: "Цикл Карно", def: "Обратимый цикл из двух изотерм и двух адиабат." },
+            { term: "КПД цикла Карно", def: "η = 1 - T₂/T₁." }
         ],
         "Электричество": [
-            { term: "Закон Кулона", desc: "Сила взаимодействия двух точечных зарядов пропорциональна произведению зарядов и обратно пропорциональна квадрату расстояния между ними." },
-            { term: "Напряжённость электрического поля", desc: "Векторная величина, равная отношению силы, действующей на пробный заряд, к этому заряду: E = F/q." },
-            { term: "Принцип суперпозиции полей", desc: "Напряжённость результирующего поля равна векторной сумме напряжённостей отдельных полей." },
-            { term: "Поток вектора напряжённости", desc: "Скалярная величина, равная произведению модуля напряжённости на площадь и косинус угла." },
-            { term: "Теорема Гаусса", desc: "Поток вектора напряжённости через замкнутую поверхность равен суммарному заряду внутри, делённому на ε₀." },
-            { term: "Потенциал электрического поля", desc: "Энергетическая характеристика поля, равная потенциальной энергии единичного положительного заряда." },
-            { term: "Электроёмкость", desc: "Способность проводника накапливать заряд; C = q/φ." },
-            { term: "Плоский конденсатор", desc: "Система из двух параллельных пластин, разделённых диэлектриком; ёмкость C = εε₀S/d." }
+            { term: "Закон Кулона", def: "Сила взаимодействия зарядов пропорциональна произведению зарядов и обратно пропорциональна квадрату расстояния." },
+            { term: "Напряжённость электрического поля", def: "Силовая характеристика поля, E = F/q." },
+            { term: "Принцип суперпозиции полей", def: "Напряжённость результирующего поля равна векторной сумме напряжённостей отдельных полей." },
+            { term: "Поток вектора напряжённости", def: "Произведение E на площадь и косинус угла." },
+            { term: "Теорема Гаусса", def: "Поток E через замкнутую поверхность равен суммарному заряду внутри, делённому на ε₀." },
+            { term: "Потенциал электрического поля", def: "Энергетическая характеристика поля, равная потенциальной энергии единичного заряда." },
+            { term: "Электроёмкость", def: "Способность проводника накапливать заряд, C = q/φ." },
+            { term: "Плоский конденсатор", def: "Две параллельные пластины с диэлектриком; ёмкость C = εε₀S/d." }
         ],
         "Магнетизм": [
-            { term: "Вектор магнитной индукции", desc: "Силовая характеристика магнитного поля, определяющая силу, действующую на движущийся заряд." },
-            { term: "Сила Ампера", desc: "Сила, действующая на проводник с током в магнитном поле: F = BIL sinα." },
-            { term: "Сила Лоренца", desc: "Сила, действующая на движущуюся заряженную частицу в магнитном поле: F = qvB sinα." },
-            { term: "Закон электромагнитной индукции", desc: "ЭДС индукции равна скорости изменения магнитного потока, взятой с обратным знаком: E = -dΦ/dt." },
-            { term: "Правило Ленца", desc: "Индукционный ток направлен так, чтобы противодействовать изменению магнитного потока, его вызвавшему." },
-            { term: "ЭДС самоиндукции", desc: "ЭДС, возникающая в контуре при изменении собственного тока; E = -L·dI/dt." },
-            { term: "Индуктивность", desc: "Физическая величина, характеризующая способность контура создавать потокосцепление при протекании тока." }
+            { term: "Вектор магнитной индукции", def: "Силовая характеристика магнитного поля." },
+            { term: "Сила Ампера", def: "Сила, действующая на проводник с током в магнитном поле: F = BIL sinα." },
+            { term: "Сила Лоренца", def: "Сила, действующая на заряд в магнитном поле: F = qvB sinα." },
+            { term: "Закон электромагнитной индукции", def: "ЭДС индукции равна скорости изменения магнитного потока со знаком минус." },
+            { term: "Правило Ленца", def: "Индукционный ток направлен так, чтобы противодействовать изменению магнитного потока." },
+            { term: "ЭДС самоиндукции", def: "ЭДС, возникающая в контуре при изменении собственного тока." },
+            { term: "Индуктивность", def: "Характеристика контура, определяющая его способность создавать потокосцепление." }
         ],
         "Колебания": [
-            { term: "Гармонические колебания", desc: "Колебания, при которых физическая величина изменяется по закону синуса или косинуса." },
-            { term: "Амплитуда колебаний", desc: "Максимальное отклонение колеблющейся величины от положения равновесия." },
-            { term: "Период колебаний", desc: "Время одного полного колебания." },
-            { term: "Частота колебаний", desc: "Число колебаний за единицу времени." },
-            { term: "Математический маятник", desc: "Материальная точка, подвешенная на невесомой нерастяжимой нити." },
-            { term: "Пружинный маятник", desc: "Груз на пружине, совершающий колебания под действием силы упругости." },
-            { term: "Биения", desc: "Периодическое изменение амплитуды при сложении двух колебаний с близкими частотами." }
+            { term: "Гармонические колебания", def: "Колебания по закону синуса или косинуса." },
+            { term: "Амплитуда колебаний", def: "Максимальное отклонение от положения равновесия." },
+            { term: "Период колебаний", def: "Время одного полного колебания." },
+            { term: "Частота колебаний", def: "Число колебаний за 1 секунду." },
+            { term: "Математический маятник", def: "Материальная точка на невесомой нерастяжимой нити." },
+            { term: "Пружинный маятник", def: "Груз на пружине." },
+            { term: "Биения", def: "Периодическое изменение амплитуды при сложении колебаний с близкими частотами." }
         ]
     };
 
-    // ----- СОСТОЯНИЕ -----
+    // ---- Глобальные переменные ----
+    let currentMode = "def_to_term";   // "def_to_term" или "term_to_def"
     let currentTopic = "Механика";
-    let currentQuestion = null;
-    let currentTerm = "";
-    let stats = {
-        correct: 0,
-        wrong: 0
-    };
+    let shuffleMode = false;            // true — вопросы из всех разделов
+    let currentItem = null;             // { term, def, topic }
+    let stats = { correct: 0, wrong: 0 };
 
-    // вспомогательная нормализация (сравнение без чувствительности к регистру и окончаниям)
+    // ---- Нормализация строк для сравнения ----
     function normalize(str) {
         return str.toLowerCase()
             .replace(/ё/g, "е")
-            .replace(/[-‑—–]/g, " ")
             .replace(/[^\w\s]/g, "")
             .replace(/\s+/g, " ")
             .trim();
     }
 
-    function isAnswerCorrect(userAnswer, term) {
-        const normUser = normalize(userAnswer);
-        const normTerm = normalize(term);
-        // точное совпадение после нормализации
-        if (normUser === normTerm) return true;
-        // дополнительно: если пользователь написал, например, "закон сохранения импульса" вместо "Закон сохранения импульса"
-        if (normTerm.includes(normUser) && normUser.length > 3) return true;
-        if (normUser.includes(normTerm)) return true;
-        return false;
-    }
-
+    // ---- Получить случайный вопрос (с учётом shuffleMode) ----
     function getRandomQuestion() {
-        const topicData = database[currentTopic];
-        if (!topicData || topicData.length === 0) return null;
-        const randomIndex = Math.floor(Math.random() * topicData.length);
-        return topicData[randomIndex];
+        let items = [];
+        if (shuffleMode) {
+            // собираем все термины из всех разделов
+            for (let [topicName, arr] of Object.entries(database)) {
+                for (let item of arr) {
+                    items.push({ ...item, topic: topicName });
+                }
+            }
+        } else {
+            const topicData = database[currentTopic];
+            if (!topicData) return null;
+            items = topicData.map(item => ({ ...item, topic: currentTopic }));
+        }
+        if (items.length === 0) return null;
+        const randomIndex = Math.floor(Math.random() * items.length);
+        return items[randomIndex];
     }
 
+    // ---- Обновить интерфейс (текст вопроса + статистика) ----
     function updateUI() {
-        if (!currentQuestion) {
-            currentQuestion = getRandomQuestion();
+        if (!currentItem) {
+            currentItem = getRandomQuestion();
+            if (!currentItem) return;
         }
-        if (currentQuestion) {
-            document.getElementById("definitionText").innerText = currentQuestion.desc;
-            currentTerm = currentQuestion.term;
+        
+        const questionDiv = document.getElementById("questionText");
+        const topicName = shuffleMode ? currentItem.topic : currentTopic;
+        
+        if (currentMode === "def_to_term") {
+            // Показываем определение → пользователь пишет термин
+            questionDiv.innerHTML = `📖 <span style="font-weight:normal">[${topicName}]</span><br>📌 Определение:<br>«${currentItem.def}»<br><span style="font-size:0.9rem;">✍️ Напишите ТЕРМИН</span>`;
         } else {
-            document.getElementById("definitionText").innerText = "Нет определений в этом разделе";
+            // Показываем термин → пользователь пишет определение
+            questionDiv.innerHTML = `📝 <span style="font-weight:normal">[${topicName}]</span><br>📌 Термин:<br>«${currentItem.term}»<br><span style="font-size:0.9rem;">✍️ Напишите ОПРЕДЕЛЕНИЕ</span>`;
         }
-        // обновляем статистику на экране
-        document.getElementById("correctCount").innerText = stats.correct;
-        document.getElementById("wrongCount").innerText = stats.wrong;
+        
+        // обновляем статистику
         const total = stats.correct + stats.wrong;
-        document.getElementById("totalCount").innerText = total;
-        let percent = 0;
-        if (total > 0) percent = (stats.correct / total) * 100;
+        const percent = total === 0 ? 0 : (stats.correct / total) * 100;
         document.getElementById("scorePercent").innerText = Math.round(percent) + "%";
         document.getElementById("fillBar").style.width = percent + "%";
+        document.getElementById("correctCount").innerText = stats.correct;
+        document.getElementById("wrongCount").innerText = stats.wrong;
+        document.getElementById("totalCount").innerText = total;
     }
 
+    // ---- Проверка ответа ----
     function checkAnswer() {
-        const inputField = document.getElementById("answerInput");
-        const userAnswer = inputField.value.trim();
+        const userAnswer = document.getElementById("answerInput").value.trim();
         if (!userAnswer) {
-            document.getElementById("feedbackMsg").innerHTML = "<span class='wrong-feedback'>✏️ Введи термин!</span>";
+            document.getElementById("feedbackMsg").innerHTML = "<span class='wrong-feedback'>✏️ Введите ответ!</span>";
             return;
         }
-        if (!currentQuestion) {
-            document.getElementById("feedbackMsg").innerHTML = "<span class='wrong-feedback'>Нет активного вопроса</span>";
+        if (!currentItem) {
+            nextQuestion();
             return;
         }
-        const isCorrect = isAnswerCorrect(userAnswer, currentTerm);
+        
+        let isCorrect = false;
+        let correctAnswer = "";
+        
+        if (currentMode === "def_to_term") {
+            // Сравниваем с термином
+            correctAnswer = currentItem.term;
+            isCorrect = normalize(userAnswer) === normalize(correctAnswer);
+        } else {
+            // Сравниваем с определением
+            correctAnswer = currentItem.def;
+            isCorrect = normalize(userAnswer) === normalize(correctAnswer);
+        }
+        
         if (isCorrect) {
             stats.correct++;
-            document.getElementById("feedbackMsg").innerHTML = "<span class='correct-feedback'>✅ Верно! Отлично.</span>";
+            document.getElementById("feedbackMsg").innerHTML = `<span class='correct-feedback'>✅ Верно! Правильный ответ: ${correctAnswer}</span>`;
         } else {
             stats.wrong++;
-            document.getElementById("feedbackMsg").innerHTML = `<span class='wrong-feedback'>❌ Неверно. Правильный ответ: <strong>${currentTerm}</strong></span>`;
+            document.getElementById("feedbackMsg").innerHTML = `<span class='wrong-feedback'>❌ Неверно. Правильный ответ: ${correctAnswer}</span>`;
         }
+        
         updateUI();
-        // очистка поля и переход к следующему вопросу (удобно)
-        inputField.value = "";
-        currentQuestion = getRandomQuestion();
-        updateUI();   // обновит текст нового определения
-        document.getElementById("feedbackMsg").scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    function nextQuestion() {
         document.getElementById("answerInput").value = "";
-        currentQuestion = getRandomQuestion();
-        updateUI();
-        document.getElementById("feedbackMsg").innerHTML = "Новый вопрос. Введите ответ.";
+        // авто-переход к следующему вопросу через 1.2 секунды (удобно)
+        setTimeout(() => {
+            nextQuestion();
+        }, 1200);
     }
-
-    function resetTopicProgress() {
+    
+    function nextQuestion() {
+        currentItem = getRandomQuestion();
+        updateUI();
+        document.getElementById("answerInput").value = "";
+        document.getElementById("feedbackMsg").innerHTML = "Введите ответ...";
+    }
+    
+    function resetStats() {
         stats.correct = 0;
         stats.wrong = 0;
-        currentQuestion = getRandomQuestion();
         updateUI();
-        document.getElementById("answerInput").value = "";
-        document.getElementById("feedbackMsg").innerHTML = "Прогресс по разделу сброшен. Начни заново!";
+        document.getElementById("feedbackMsg").innerHTML = "📊 Статистика сброшена. Продолжайте!";
     }
-
+    
+    // ---- Отрисовка кнопок разделов ----
     function renderTopicButtons() {
         const container = document.getElementById("topicSelector");
         container.innerHTML = "";
         const topics = Object.keys(database);
         topics.forEach(topic => {
             const btn = document.createElement("button");
-            btn.className = "topic-btn" + (currentTopic === topic ? " active" : "");
+            btn.className = "topic-btn" + (currentTopic === topic && !shuffleMode ? " active" : "");
             btn.innerText = topic;
             btn.addEventListener("click", () => {
+                if (shuffleMode) {
+                    shuffleMode = false;
+                    document.getElementById("shuffleBtn").style.background = "#475569";
+                }
                 currentTopic = topic;
-                // сброс статистики при смене раздела (опционально, но логично для чистоты тренировки)
-                stats.correct = 0;
-                stats.wrong = 0;
-                currentQuestion = getRandomQuestion();
-                document.getElementById("answerInput").value = "";
-                document.getElementById("feedbackMsg").innerHTML = `Раздел: ${topic}. Введи термин.`;
+                currentItem = getRandomQuestion();
                 updateUI();
-                // обновить активную кнопку
+                // обновить активный стиль
                 document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
+                document.getElementById("feedbackMsg").innerHTML = `Раздел: ${topic}. Введите ответ.`;
             });
             container.appendChild(btn);
         });
     }
-
-    // инициализация
+    
+    // ---- Переключатель режимов ----
+    function initModeButtons() {
+        const modeBtns = document.querySelectorAll(".mode-btn");
+        modeBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                modeBtns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentMode = btn.getAttribute("data-mode");
+                // сбрасываем текущий вопрос, чтобы обновился текст
+                currentItem = getRandomQuestion();
+                updateUI();
+                document.getElementById("feedbackMsg").innerHTML = `Режим: ${currentMode === "def_to_term" ? "Определение → Термин" : "Термин → Определение"}`;
+            });
+        });
+    }
+    
+    // ---- Кнопка "Вперемешку" ----
+    function setupShuffle() {
+        const shuffleBtn = document.getElementById("shuffleBtn");
+        shuffleBtn.addEventListener("click", () => {
+            shuffleMode = !shuffleMode;
+            if (shuffleMode) {
+                shuffleBtn.style.background = "#3b82f6";
+                // убираем активную тему
+                document.querySelectorAll(".topic-btn").forEach(b => b.classList.remove("active"));
+            } else {
+                shuffleBtn.style.background = "#475569";
+                // подсветим текущую тему
+                const activeTopicBtn = Array.from(document.querySelectorAll(".topic-btn")).find(b => b.innerText === currentTopic);
+                if (activeTopicBtn) activeTopicBtn.classList.add("active");
+            }
+            currentItem = getRandomQuestion();
+            updateUI();
+            document.getElementById("feedbackMsg").innerHTML = shuffleMode ? "🎲 Режим «Вперемешку» (все разделы)" : "📁 Обычный режим по разделам";
+        });
+    }
+    
+    // ---- Инициализация ----
     function init() {
         renderTopicButtons();
-        currentQuestion = getRandomQuestion();
+        initModeButtons();
+        setupShuffle();
+        currentItem = getRandomQuestion();
         updateUI();
         document.getElementById("checkBtn").addEventListener("click", checkAnswer);
         document.getElementById("nextBtn").addEventListener("click", nextQuestion);
-        document.getElementById("resetTopicBtn").addEventListener("click", resetTopicProgress);
+        document.getElementById("resetBtn").addEventListener("click", resetStats);
         document.getElementById("answerInput").addEventListener("keypress", (e) => {
             if (e.key === "Enter") checkAnswer();
         });
     }
-
     init();
 </script>
 </body>
